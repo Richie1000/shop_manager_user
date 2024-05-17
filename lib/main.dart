@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shop_manager_user/providers/auth.dart';
 import 'package:shop_manager_user/screens/auth_screen.dart';
+import 'package:shop_manager_user/screens/stocks_screen.dart';
 import './screens/home.dart';
+import 'providers/products.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -16,10 +18,13 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => AuthProvider(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => AuthProvider()),
+        ChangeNotifierProvider(create: (context) => Products()),
+      ],
       child: MaterialApp(
-        title: 'Your App Name',
+        title: 'Arturo',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.deepPurple),
           useMaterial3: true,
@@ -33,6 +38,11 @@ class MyApp extends StatelessWidget {
             }
           },
         ),
+        // routes: {
+        //   //'/': (BuildContext context) => HomePage(),
+        //   //AuthScreen.routeName: (BuildContext context) => AuthScreen(),
+        //   StocksScreen.routeName: (BuildContext context) => StocksScreen()
+        // },
       ),
     );
   }
