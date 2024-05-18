@@ -13,18 +13,13 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchProducts() async {
-    print("Fetching");
     try {
-      print("starting here");
       QuerySnapshot snapshot = await _firestore.collection('products').get();
       _products = snapshot.docs.map((doc) {
         return Product.fromFirestore(
             doc.data() as Map<String, dynamic>, doc.id);
       }).toList();
-      print(_products.length);
-    } catch (error) {
-      print(error);
-    }
+    } catch (error) {}
     notifyListeners();
   }
 
@@ -37,7 +32,7 @@ class Products with ChangeNotifier {
         sellingPrice: product.sellingPrice,
         buyingPrice: product.buyingPrice,
         name: product.name,
-        //quantity: product.quantity,
+        quantity: product.quantity,
         uom: product.uom,
       ));
     } catch (error) {
@@ -65,11 +60,8 @@ class Products with ChangeNotifier {
   }
 
   Stream<List<Product>> get productsStream {
-    print("Fetching products stream...");
     return _firestore.collection('products').snapshots().map((snapshot) {
-      print("Snapshot received: ${snapshot.docs.length} documents");
       return snapshot.docs.map((doc) {
-        print("Document data: ${doc.data()}");
         return Product.fromFirestore(
             doc.data() as Map<String, dynamic>, doc.id);
       }).toList();

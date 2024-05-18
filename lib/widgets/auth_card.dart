@@ -126,14 +126,11 @@ class _AuthCardState extends State<AuthCard>
     } catch (error) {
       // Handle authentication errors (e.g., display error message)
     } finally {
+      Navigator.of(context).pop();
       setState(() {
         _isLoading = false;
       });
-
-      Navigator.of(context).pop(); // Remove loading screen
     }
-
-    //Navigator.of(context).pop(); // Remove loading screen
   }
 
   @override

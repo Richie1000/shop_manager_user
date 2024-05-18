@@ -5,6 +5,7 @@ import 'package:shop_manager_user/providers/auth.dart';
 import 'package:shop_manager_user/screens/auth_screen.dart';
 import 'package:shop_manager_user/screens/stocks_screen.dart';
 import './screens/home.dart';
+import 'providers/cart.dart';
 import 'providers/products.dart';
 
 void main() async {
@@ -22,6 +23,7 @@ class MyApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (context) => Products()),
+        ChangeNotifierProvider(create: (context) => Cart()),
       ],
       child: MaterialApp(
         title: 'Arturo',

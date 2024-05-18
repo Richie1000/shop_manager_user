@@ -3,7 +3,7 @@ class Product {
   final double sellingPrice;
   final double buyingPrice;
   final String name;
-  //final int quantity;
+  final int quantity;
   final String uom;
 
   Product({
@@ -11,7 +11,7 @@ class Product {
     required this.sellingPrice,
     required this.buyingPrice,
     required this.name,
-    //required this.quantity,
+    required this.quantity,
     required this.uom,
   });
 
@@ -21,7 +21,7 @@ class Product {
       sellingPrice: data['sellingPrice'],
       buyingPrice: data['buyingPrice'],
       name: data['name'],
-      // quantity: data['quantity'],
+      quantity: data['quantity'],
       uom: data['uom'],
     );
   }
@@ -31,7 +31,7 @@ class Product {
       'sellingPrice': sellingPrice,
       'buyingPrice': buyingPrice,
       'name': name,
-      //'quantity': quantity,
+      'quantity': quantity,
       'uom': uom,
     };
   }

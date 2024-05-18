@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_manager_user/screens/sales_screen.dart';
 import 'package:shop_manager_user/screens/stocks_screen.dart';
 import '../providers/auth.dart';
 import '../widgets/grid_item.dart';
@@ -27,6 +28,8 @@ class HomePage extends StatelessWidget {
 
     pushSalesScreen() {
       //pushScreen
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => SalesScreen()));
     }
 
     pushStatsScreen() {
