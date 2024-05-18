@@ -62,19 +62,19 @@ class _StocksScreenState extends State<StocksScreen> {
               child: DataTable(
                 columns: [
                   DataColumn(label: Text('Name')),
+                  DataColumn(label: Text('Quantity')),
                   DataColumn(label: Text('Selling Price')),
                   DataColumn(label: Text('Buying Price')),
-                  DataColumn(label: Text('Quantity')),
                   DataColumn(label: Text('UOM')),
                 ],
                 rows: products.map((product) {
                   return DataRow(cells: [
                     DataCell(Text(product.name)),
+                    DataCell(Text(product.quantity.toString())),
                     DataCell(
                         Text('\$${product.sellingPrice.toStringAsFixed(2)}')),
                     DataCell(
                         Text('\$${product.buyingPrice.toStringAsFixed(2)}')),
-                    DataCell(Text(product.quantity.toString())),
                     DataCell(Text(product.uom)),
                   ]);
                 }).toList(),

@@ -39,7 +39,7 @@ class _SalesScreenState extends State<SalesScreen> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.add),
             onPressed: () {
               showSearch(
                 context: context,

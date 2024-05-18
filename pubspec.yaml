@@ -46,6 +46,7 @@ dependencies:
   pdf: ^3.10.8
   firebase_storage: ^11.7.5
   uuid: ^4.4.0
+  path_provider: ^2.1.3
 
 dev_dependencies:
   flutter_test:

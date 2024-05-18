@@ -94,17 +94,20 @@ class _AuthCardState extends State<AuthCard>
       _isLoading = true;
     });
 
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          child: LoadingScreen(),
-        );
-      },
-    );
+    // Show dialog only when _isLoading is true
+    if (_isLoading) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Dialog(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            child: LoadingScreen(),
+          );
+        },
+      );
+    }
 
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
@@ -126,7 +129,9 @@ class _AuthCardState extends State<AuthCard>
     } catch (error) {
       // Handle authentication errors (e.g., display error message)
     } finally {
-      Navigator.of(context).pop();
+      if (_isLoading) {
+        Navigator.of(context).pop(); // Close the dialog
+      }
       setState(() {
         _isLoading = false;
       });

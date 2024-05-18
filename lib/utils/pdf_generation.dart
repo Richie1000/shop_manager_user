@@ -7,6 +7,43 @@ import 'package:shop_manager_user/widgets/custom_toast.dart';
 import 'package:uuid/uuid.dart';
 
 import '../providers/cart.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+
+String getReceiptNumber() {
+  // Get the current DateTime
+  DateTime now = DateTime.now();
+
+  // Define a list of month abbreviations
+  const List<String> monthAbbreviations = [
+    'Ja',
+    'Fe',
+    'Ma',
+    'Ap',
+    'Ma',
+    'Ju',
+    'Ju',
+    'Au',
+    'Se',
+    'Oc',
+    'No',
+    'De'
+  ];
+
+  // Get the first two letters of the current month
+  String month = monthAbbreviations[now.month - 1];
+
+  // Format the current DateTime without hyphens, colons, and periods
+  String formattedDateTime = '${now.year}'
+      '${now.month.toString().padLeft(2, '0')}'
+      '${now.day.toString().padLeft(2, '0')}'
+      '${now.hour.toString().padLeft(2, '0')}'
+      '${now.minute.toString().padLeft(2, '0')}'
+      '${now.second.toString().padLeft(2, '0')}';
+
+  // Concatenate the month abbreviation with the formatted DateTime
+  return '$month$formattedDateTime';
+}
 
 Future<Uint8List> generateAndSaveReceipt(
   List<CartItem> items,
@@ -18,7 +55,7 @@ Future<Uint8List> generateAndSaveReceipt(
     final pdf = pw.Document();
 
     // Generate receipt number
-    final String receiptNumber = Uuid().v4();
+    final String receiptNumber = getReceiptNumber();
 
     // Add page to PDF
     pdf.addPage(
@@ -56,18 +93,25 @@ Future<Uint8List> generateAndSaveReceipt(
       ),
     );
 
-    // Save PDF to Firestore Storage
+    // Save PDF to local storage
     final pdfBytes = await pdf.save();
+
+    final directory = await getApplicationDocumentsDirectory();
+    final filePath = '${directory.path}/$receiptNumber.pdf';
+    final file = File(filePath);
+    await file.writeAsBytes(pdfBytes);
+
+    // Save PDF to Firestore Storage
     final downloadUrl = await savePdfToStorage(receiptNumber, pdfBytes);
 
     // Add transaction to "receipts" collection on Firestore
     await addTransactionToFirestore(
         receiptNumber, items, totalAmount, paymentMethod, downloadUrl);
 
+    print('PDF saved to local storage: $filePath');
+
     return pdfBytes; // Return PDF bytes
-  } catch (e, stackTrace) {
-    print('Error generating and saving receipt: $e');
-    print('Stack trace: $stackTrace');
+  } catch (e) {
     CustomToast(message: e.toString());
     rethrow; // Rethrow the caught exception
   }
