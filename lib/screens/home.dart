@@ -7,6 +7,7 @@ import 'package:shop_manager_user/screens/sales_screen.dart';
 import 'package:shop_manager_user/screens/stocks_screen.dart';
 import '../providers/auth.dart';
 import '../widgets/grid_item.dart';
+import './receipts_screen.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -45,6 +46,8 @@ class HomePage extends StatelessWidget {
 
     pushReceiptsScreen() {
       //pushScreen
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => ReceiptScreen()));
     }
 
     List<Function()> listOfFunctions = [
