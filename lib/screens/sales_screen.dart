@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import '../models/product.dart';
 import '../providers/products.dart';
@@ -160,7 +161,11 @@ class ProductSearchDelegate extends SearchDelegate<String> {
       stream: productProvider.productsStream,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return Center(
+            child: Lottie.asset(
+              'assets/animations/loading.json',
+            ),
+          );
         }
 
         final products = snapshot.data!

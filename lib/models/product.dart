@@ -35,4 +35,12 @@ class Product {
       'uom': uom,
     };
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'productID': id,
+      'name': name,
+      'sellingPrice': sellingPrice,
+    };
+  }
 }

@@ -7,7 +7,16 @@ class CartItem {
 
   CartItem({required this.product, required this.quantity});
 
-  toMap() {}
+  //toMap() {}
+
+  Map<String, dynamic> toMap() {
+    return {
+      'productID': product.id,
+      'productName': product.name,
+      'sellingPrice': product.sellingPrice,
+      'quantity': quantity,
+    };
+  }
 }
 
 class Cart with ChangeNotifier {
