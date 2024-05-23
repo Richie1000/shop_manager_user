@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_manager_user/screens/detailsStatsScreen.dart';
 import 'package:shop_manager_user/screens/sales_screen.dart';
 import 'package:shop_manager_user/screens/stocks_screen.dart';
 import '../providers/auth.dart';
@@ -13,6 +14,8 @@ class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
   static const routeName = '/homePage';
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +37,7 @@ class HomePage extends StatelessWidget {
     }
 
     pushStatsScreen() {
-      //pushScreen
+     Navigator.push(context, MaterialPageRoute(builder: (context)=> DetailStatsScreen()));
     }
 
     pushStocksScreen() {

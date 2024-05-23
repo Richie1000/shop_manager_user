@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+
 import '../models/product.dart';
 import '../providers/products.dart';
 import '../providers/cart.dart';
@@ -14,6 +15,12 @@ class SalesScreen extends StatefulWidget {
 
 class _SalesScreenState extends State<SalesScreen> {
   String _selectedPaymentMethod = 'Cash';
+
+  @override
+  void initState() {
+
+    super.initState();
+  }
 
   void _incrementQuantity(Product product) {
     final cart = Provider.of<Cart>(context, listen: false);
@@ -143,7 +150,7 @@ class ProductSearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.arrow_back),
+      icon: Icon(Icons.search),
       onPressed: () {
         close(context, '');
       },

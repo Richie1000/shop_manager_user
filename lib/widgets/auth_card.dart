@@ -85,6 +85,7 @@ class _AuthCardState extends State<AuthCard>
 
   Future<void> _submit(BuildContext context) async {
     if (!_formKey.currentState!.validate()) {
+
       return;
     }
 

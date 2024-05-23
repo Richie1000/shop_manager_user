@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:pdf/pdf.dart' as pw;
 import 'package:pdf/widgets.dart' as pw;
+
 import 'package:shop_manager_user/widgets/custom_toast.dart';
 import 'package:uuid/uuid.dart';
 import '../providers/cart.dart';
@@ -13,6 +14,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:intl/intl.dart';
 
 import '../screens/loading_screen.dart';
+
+
 
 String getReceiptNumber() {
   // Get the current DateTime
@@ -167,6 +170,8 @@ Future<void> addTransactionToFirestore(
   final List<Map<String, dynamic>> itemsData =
       items.map((item) => item.toMap()).toList();
 
+
+
   // Add transaction to Firestore
   await firestore.collection('receipts').doc(receiptNumber).set({
     'items': itemsData,
@@ -175,7 +180,25 @@ Future<void> addTransactionToFirestore(
     'date': DateTime.now(),
     'pdfDownloadUrl': pdfDownloadUrl, // Add download URL of PDF
   });
+
+  // Add 
+   final DocumentReference statsRef = firestore.collection('statistics').doc('totalAmount');
+
+  await firestore.runTransaction((transaction) async {
+    DocumentSnapshot snapshot = await transaction.get(statsRef);
+    double currentTotal = snapshot.exists ? snapshot['total'] : 0.0;
+
+    double newTotal = currentTotal + totalAmount;
+    transaction.set(statsRef, {'total': newTotal});
+
+    transaction.set(firestore.collection('payments').doc(), {
+      'amount': totalAmount,
+      'date': Timestamp.now(),
+    });
+  });
 }
+
+// fetch total amount from the database and then add totalAmount to TotalAmount
 
 Future<void> updateProductQuantities(List<CartItem> items) async {
   final firestore = FirebaseFirestore.instance;
