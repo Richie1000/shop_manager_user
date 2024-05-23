@@ -15,8 +15,6 @@ import 'package:intl/intl.dart';
 
 import '../screens/loading_screen.dart';
 
-
-
 String getReceiptNumber() {
   // Get the current DateTime
   DateTime now = DateTime.now();
@@ -170,8 +168,6 @@ Future<void> addTransactionToFirestore(
   final List<Map<String, dynamic>> itemsData =
       items.map((item) => item.toMap()).toList();
 
-
-
   // Add transaction to Firestore
   await firestore.collection('receipts').doc(receiptNumber).set({
     'items': itemsData,
@@ -179,11 +175,12 @@ Future<void> addTransactionToFirestore(
     'paymentMethod': paymentMethod,
     'date': DateTime.now(),
     'pdfDownloadUrl': pdfDownloadUrl,
-    'receiptsNumber' :receiptNumber // Add download URL of PDF
+    'receiptsNumber': receiptNumber // Add download URL of PDF
   });
 
-  // Add 
-   final DocumentReference statsRef = firestore.collection('statistics').doc('totalAmount');
+  // Add
+  final DocumentReference statsRef =
+      firestore.collection('statistics').doc('totalAmount');
 
   await firestore.runTransaction((transaction) async {
     DocumentSnapshot snapshot = await transaction.get(statsRef);
@@ -192,14 +189,14 @@ Future<void> addTransactionToFirestore(
     double newTotal = currentTotal + totalAmount;
     transaction.set(statsRef, {'total': newTotal});
 
-    transaction.set(firestore.collection('payments').doc(), {
-      'amount': totalAmount,
-      'date': Timestamp.now(),
-    });
+    // transaction.set(firestore.collection('payments').doc(), {
+    //   'amount': totalAmount,
+    //   'date': Timestamp.now(),
+    // });
   });
-}
 
-// fetch total amount from the database and then add totalAmount to TotalAmount
+  await updateStatistics(totalAmount);
+}
 
 Future<void> updateProductQuantities(List<CartItem> items) async {
   final firestore = FirebaseFirestore.instance;
@@ -241,5 +238,32 @@ Future<void> checkProductQuantities(List<CartItem> items) async {
       //Navigator.of(context).pop();
       throw Exception("Insufficient stock for product: ${item.product.name}");
     }
+  }
+}
+
+Future<void> updateStatistics(double transactionTotal) async {
+  // Get today's date formatted as dd/MM/yyyy
+  DateTime now = DateTime.now();
+  String formattedDate = DateFormat('dd/MM/yyyy').format(now);
+  String dateWithoutSlashes = formattedDate.replaceAll('/', '');
+
+  // Reference to the document with today's date as the ID
+  DocumentReference docRef = FirebaseFirestore.instance
+      .collection('statistics')
+      .doc(dateWithoutSlashes);
+
+  // Get the document snapshot
+  DocumentSnapshot docSnapshot = await docRef.get();
+
+  // Check if the document exists
+  if (docSnapshot.exists) {
+    // Document exists, update the total field
+    await docRef.update({'total': FieldValue.increment(transactionTotal)});
+  } else {
+    // Document does not exist, create it with the initial total
+    await docRef.set({
+      'total': transactionTotal,
+      'date': formattedDate // Store the date for reference if needed
+    });
   }
 }

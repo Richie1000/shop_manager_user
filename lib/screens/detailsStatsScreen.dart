@@ -23,8 +23,9 @@ class DetailStatsScreen extends StatelessWidget {
             child: GridView.count(
               crossAxisCount: 2,
               children: [
+                _buildGridItem(
+                    'Today\'s Date', DateFormat('dd/MM/yyyy').format(today)),
                 _buildTotalAmountItem(),
-                _buildGridItem('Today\'s Date', DateFormat('dd/MM/yyyy').format(today)),
               ],
               mainAxisSpacing: 8.0,
               crossAxisSpacing: 8.0,
@@ -34,7 +35,8 @@ class DetailStatsScreen extends StatelessWidget {
           // Bottom Section for Receipts
           Expanded(
             child: StreamBuilder<QuerySnapshot>(
-              stream: FirebaseFirestore.instance.collection('receipts').snapshots(),
+              stream:
+                  FirebaseFirestore.instance.collection('receipts').snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
                   return Center(child: CircularProgressIndicator());
@@ -88,7 +90,10 @@ class DetailStatsScreen extends StatelessWidget {
 
   Widget _buildTotalAmountItem() {
     return StreamBuilder<DocumentSnapshot>(
-      stream: FirebaseFirestore.instance.collection('statistics').doc('totalAmount').snapshots(),
+      stream: FirebaseFirestore.instance
+          .collection('statistics')
+          .doc('totalAmount')
+          .snapshots(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           return _buildGridItem('Total Amount', 'Loading...');
@@ -109,7 +114,7 @@ class DetailStatsScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-              Text(
+            Text(
               'Receipt No: ${receiptData['receiptsNumber']}',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
             ),
@@ -121,7 +126,6 @@ class DetailStatsScreen extends StatelessWidget {
               'Date: ${receiptData['date'].toDate()}',
               style: TextStyle(fontSize: 14.0),
             ),
-          
             Text(
               'Selling Price: \$${receiptData['totalAmount']}',
               style: TextStyle(fontSize: 14.0),
