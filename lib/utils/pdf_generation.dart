@@ -178,7 +178,8 @@ Future<void> addTransactionToFirestore(
     'totalAmount': totalAmount,
     'paymentMethod': paymentMethod,
     'date': DateTime.now(),
-    'pdfDownloadUrl': pdfDownloadUrl, // Add download URL of PDF
+    'pdfDownloadUrl': pdfDownloadUrl,
+    'receiptsNumber' :receiptNumber // Add download URL of PDF
   });
 
   // Add 

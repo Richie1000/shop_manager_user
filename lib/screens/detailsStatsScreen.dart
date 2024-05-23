@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:intl/intl.dart';
+import 'package:shop_manager_user/utils/styles.dart';
 
 class DetailStatsScreen extends StatelessWidget {
   @override
@@ -72,11 +74,11 @@ class DetailStatsScreen extends StatelessWidget {
           children: [
             Text(
               title,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16.0),
+              style: Styles.headline2,
             ),
             Text(
               value,
-              style: TextStyle(fontSize: 14.0),
+              style: Styles.headline4,
             ),
           ],
         ),
@@ -93,7 +95,7 @@ class DetailStatsScreen extends StatelessWidget {
         }
         final data = snapshot.data!.data() as Map<String, dynamic>;
         final totalAmount = data['total'].toString();
-        return _buildGridItem('Total Amount', totalAmount);
+        return _buildGridItem('Total Amount', 'GHC:${totalAmount}');
       },
     );
   }
@@ -107,21 +109,22 @@ class DetailStatsScreen extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+              Text(
+              'Receipt No: ${receiptData['receiptsNumber']}',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
+            ),
             Text(
               'Product: ${receiptData['items']}',
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
             ),
             Text(
               'Date: ${receiptData['date'].toDate()}',
-              style: TextStyle(fontSize: 12.0),
+              style: TextStyle(fontSize: 14.0),
             ),
-            Text(
-              'Receipt No: ${receiptData['receiptNumber']}',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.0),
-            ),
+          
             Text(
               'Selling Price: \$${receiptData['totalAmount']}',
-              style: TextStyle(fontSize: 12.0),
+              style: TextStyle(fontSize: 14.0),
             ),
           ],
         ),
