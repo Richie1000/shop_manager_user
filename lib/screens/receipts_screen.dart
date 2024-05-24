@@ -1,11 +1,6 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:open_file/open_file.dart';
-import 'package:dio/dio.dart';
-import 'package:shop_manager_user/screens/loading_screen.dart';
-import 'package:shop_manager_user/widgets/custom_toast.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
 
 class ReceiptScreen extends StatefulWidget {
   @override
@@ -29,21 +24,23 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
 
       if (docSnapshot.exists) {
         final pdfDownloadUrl = docSnapshot['pdfDownloadUrl'];
-        final fileName = '$receiptId.pdf';
-        final dir = await getApplicationDocumentsDirectory();
-        final filePath = '${dir.path}/$fileName';
-
-        print("Found Receipts!");
+        print("Found Receipt!");
         print('The download Url: $pdfDownloadUrl');
 
-        await _downloadFile(pdfDownloadUrl, filePath);
-
-        print("Downloaded Receipts");
-        await OpenFile.open(filePath);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PdfViewerScreen(url: pdfDownloadUrl),
+          ),
+        );
       } else {
-        CustomToast(message: "Receipt Not Found!");
+        print("Receipt Not Found!");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Receipt Not Found!")),
+        );
       }
     } catch (e) {
+      print('Error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Error: $e')),
       );
@@ -52,11 +49,6 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
         _isLoading = false;
       });
     }
-  }
-
-  Future<void> _downloadFile(String url, String filePath) async {
-    final dio = Dio();
-    await dio.download(url, filePath);
   }
 
   @override
@@ -92,8 +84,32 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
               ],
             ),
           ),
-          if (_isLoading) LoadingScreen(),
+          if (_isLoading)
+            Center(
+              child: CircularProgressIndicator(),
+            ),
         ],
+      ),
+    );
+  }
+}
+
+class PdfViewerScreen extends StatelessWidget {
+  final String url;
+
+  PdfViewerScreen({required this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('PDF Viewer'),
+      ),
+      body: PDF().fromUrl(
+        url,
+        placeholder: (progress) =>
+            Center(child: CircularProgressIndicator(value: progress / 100)),
+        errorWidget: (error) => Center(child: Text(error.toString())),
       ),
     );
   }
