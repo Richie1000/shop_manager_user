@@ -1,6 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_manager_user/screens/loading_screen.dart';
+import 'package:shop_manager_user/widgets/custom_toast.dart';
 import '../models/product.dart';
 import '../providers/products.dart';
 
@@ -15,6 +17,33 @@ class _StocksScreenState extends State<StocksScreen> {
   TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
+String _selectedRole = "Viewer";
+  bool _isEditor = false;
+  bool _isLoading = true;
+  
+  @override
+  void initState() {
+    super.initState();
+    _checkRole();
+  }
+
+  Future<void> _checkRole() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection("employee")
+          .where("role", isEqualTo: "Editor")
+          .get();
+      setState(() {
+        _isEditor = querySnapshot.docs.isNotEmpty;
+        _isLoading = false;
+      });
+    } catch (e) {
+      CustomToast(message: e.toString());
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<Products>(context, listen: false);
@@ -41,48 +70,72 @@ class _StocksScreenState extends State<StocksScreen> {
         ],
       ),
       backgroundColor: Colors.white,
-      body: StreamBuilder<List<Product>>(
-        stream: productProvider.productsStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return LoadingScreen();
-          } else if (snapshot.hasError) {
-            print(snapshot.error);
-            return Center(child: Text('Error fetching products'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No products available'));
-          } else {
-            final products = snapshot.data!
-                .where((product) => product.name
-                    .toLowerCase()
-                    .contains(_searchQuery.toLowerCase()))
-                .toList();
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columns: [
-                  DataColumn(label: Text('Name')),
-                  DataColumn(label: Text('Quantity')),
-                  DataColumn(label: Text('Selling Price')),
-                  DataColumn(label: Text('Buying Price')),
-                  DataColumn(label: Text('UOM')),
-                ],
-                rows: products.map((product) {
-                  return DataRow(cells: [
-                    DataCell(Text(product.name)),
-                    DataCell(Text(product.quantity.toString())),
-                    DataCell(
-                        Text('\$${product.sellingPrice.toStringAsFixed(2)}')),
-                    DataCell(
-                        Text('\$${product.buyingPrice.toStringAsFixed(2)}')),
-                    DataCell(Text(product.uom)),
-                  ]);
-                }).toList(),
+      body: Column(
+        children: [
+          if (_selectedRole == "Editor")
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  // Add delete functionality here
+                },
+                child: Text("Delete"),
               ),
-            );
-          }
-        },
+            ),
+          Expanded(
+            child: StreamBuilder<List<Product>>(
+              stream: productProvider.productsStream,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return LoadingScreen();
+                } else if (snapshot.hasError) {
+                  print(snapshot.error);
+                  return Center(child: Text('Error fetching products'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No products available'));
+                } else {
+                  final products = snapshot.data!
+                      .where((product) => product.name
+                          .toLowerCase()
+                          .contains(_searchQuery.toLowerCase()))
+                      .toList();
+                  return SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: DataTable(
+                      columns: [
+                        DataColumn(label: Text('Name')),
+                        DataColumn(label: Text('Quantity')),
+                        DataColumn(label: Text('Selling Price')),
+                        DataColumn(label: Text('Buying Price')),
+                        DataColumn(label: Text('UOM')),
+                      ],
+                      rows: products.map((product) {
+                        return DataRow(cells: [
+                          DataCell(Text(product.name)),
+                          DataCell(Text(product.quantity.toString())),
+                          DataCell(Text('\$${product.sellingPrice.toStringAsFixed(2)}')),
+                          DataCell(Text('\$${product.buyingPrice.toStringAsFixed(2)}')),
+                          DataCell(Text(product.uom)),
+                        ]);
+                      }).toList(),
+                    ),
+                  );
+                }
+              },
+            ),
+          ),
+        ],
       ),
+      floatingActionButton: _isLoading
+          ? null
+          : _isEditor
+              ? FloatingActionButton.extended(
+                  onPressed: () {
+                    // Add functionality here
+                  },
+                  icon: Icon(Icons.add),
+                  label: Text("Add"),
+                )
+              : null,
     );
   }
 }
