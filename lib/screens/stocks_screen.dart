@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_manager_user/screens/add_product_screen.dart';
 import 'package:shop_manager_user/screens/loading_screen.dart';
 import '../models/product.dart';
 import '../providers/products.dart';
+import '../providers/employees.dart';
+import '../widgets/products_data_table.dart'; // Import EmployeeProvider
 
 class StocksScreen extends StatefulWidget {
   static const routeName = '/stocksScreen';
@@ -14,10 +18,22 @@ class StocksScreen extends StatefulWidget {
 class _StocksScreenState extends State<StocksScreen> {
   TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  List<Product> _selectedProducts = [];
+
+  void _editProduct(Product product) {
+    // Implement your edit product logic here
+  }
+
+  void _deleteSelectedProducts() {
+    // Implement your delete selected products logic here
+  }
 
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<Products>(context, listen: false);
+    final employeeProvider = Provider.of<EmployeeProvider>(context);
+
+    bool isEditor = employeeProvider.employee?.role == "Editor";
 
     return Scaffold(
       appBar: AppBar(
@@ -41,48 +57,68 @@ class _StocksScreenState extends State<StocksScreen> {
         ],
       ),
       backgroundColor: Colors.white,
-      body: StreamBuilder<List<Product>>(
-        stream: productProvider.productsStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return LoadingScreen();
-          } else if (snapshot.hasError) {
-            print(snapshot.error);
-            return Center(child: Text('Error fetching products'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(child: Text('No products available'));
-          } else {
-            final products = snapshot.data!
-                .where((product) => product.name
-                    .toLowerCase()
-                    .contains(_searchQuery.toLowerCase()))
-                .toList();
-            return SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columns: [
-                  DataColumn(label: Text('Name')),
-                  DataColumn(label: Text('Quantity')),
-                  DataColumn(label: Text('Selling Price')),
-                  DataColumn(label: Text('Buying Price')),
-                  DataColumn(label: Text('UOM')),
-                ],
-                rows: products.map((product) {
-                  return DataRow(cells: [
-                    DataCell(Text(product.name)),
-                    DataCell(Text(product.quantity.toString())),
-                    DataCell(
-                        Text('\$${product.sellingPrice.toStringAsFixed(2)}')),
-                    DataCell(
-                        Text('\$${product.buyingPrice.toStringAsFixed(2)}')),
-                    DataCell(Text(product.uom)),
-                  ]);
-                }).toList(),
+      body: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        verticalDirection: VerticalDirection.down,
+        children: [
+          Expanded(
+            child:
+                ListView(scrollDirection: Axis.horizontal, children: <Widget>[
+              StreamBuilder<List<Product>>(
+                stream: productProvider.productsStream,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: Lottie.asset(
+                        'assets/animations/loading.json',
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    print(snapshot.error);
+                    return Center(child: Text('Error fetching products'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No products available'));
+                  } else {
+                    final products = snapshot.data!
+                        .where((product) => product.name
+                            .toLowerCase()
+                            .contains(_searchQuery.toLowerCase()))
+                        .toList();
+                    return ProductsDataTable(
+                      products: products,
+                      onProductSelected: (product, selected) {
+                        setState(() {
+                          if (selected) {
+                            _selectedProducts.add(product);
+                          } else {
+                            _selectedProducts.remove(product);
+                          }
+                        });
+                      },
+                      isEditor: isEditor,
+                      selectedProducts: _selectedProducts,
+                    );
+                  }
+                },
               ),
-            );
-          }
-        },
+            ]),
+          ),
+        ],
       ),
+      floatingActionButton: isEditor
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddProductScreen(),
+                  ),
+                );
+              },
+              child: Icon(Icons.add),
+            )
+          : null,
     );
   }
 }
