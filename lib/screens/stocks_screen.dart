@@ -1,10 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
+import 'package:shop_manager_user/screens/add_product_screen.dart';
 import 'package:shop_manager_user/screens/loading_screen.dart';
 import 'package:shop_manager_user/widgets/custom_toast.dart';
 import '../models/product.dart';
 import '../providers/products.dart';
+import '../providers/employees.dart';
+import '../widgets/products_data_table.dart'; // Import EmployeeProvider
 
 class StocksScreen extends StatefulWidget {
   static const routeName = '/stocksScreen';
@@ -16,6 +20,15 @@ class StocksScreen extends StatefulWidget {
 class _StocksScreenState extends State<StocksScreen> {
   TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  List<Product> _selectedProducts = [];
+
+  void _editProduct(Product product) {
+    // Implement your edit product logic here
+  }
+
+  void _deleteSelectedProducts() {
+    // Implement your delete selected products logic here
+  }
 
 String _selectedRole = "Viewer";
   bool _isEditor = false;
@@ -47,6 +60,9 @@ String _selectedRole = "Viewer";
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<Products>(context, listen: false);
+    final employeeProvider = Provider.of<EmployeeProvider>(context);
+
+    bool isEditor = employeeProvider.employee?.role == "Editor";
 
     return Scaffold(
       appBar: AppBar(
@@ -71,6 +87,7 @@ String _selectedRole = "Viewer";
       ),
       backgroundColor: Colors.white,
       body: Column(
+
         children: [
           if (_selectedRole == "Editor")
             Center(
@@ -136,6 +153,66 @@ String _selectedRole = "Viewer";
                   label: Text("Add"),
                 )
               : null,
+
+        
+          Expanded(
+            child:
+                ListView(scrollDirection: Axis.horizontal, children: <Widget>[
+              StreamBuilder<List<Product>>(
+                stream: productProvider.productsStream,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                      child: Lottie.asset(
+                        'assets/animations/loading.json',
+                      ),
+                    );
+                  } else if (snapshot.hasError) {
+                    print(snapshot.error);
+                    return Center(child: Text('Error fetching products'));
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return Center(child: Text('No products available'));
+                  } else {
+                    final products = snapshot.data!
+                        .where((product) => product.name
+                            .toLowerCase()
+                            .contains(_searchQuery.toLowerCase()))
+                        .toList();
+                    return ProductsDataTable(
+                      products: products,
+                      onProductSelected: (product, selected) {
+                        setState(() {
+                          if (selected) {
+                            _selectedProducts.add(product);
+                          } else {
+                            _selectedProducts.remove(product);
+                          }
+                        });
+                      },
+                      isEditor: isEditor,
+                      selectedProducts: _selectedProducts,
+                    );
+                  }
+                },
+              ),
+            ]),
+          ),
+        ],
+      ),
+      floatingActionButton: isEditor
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddProductScreen(),
+                  ),
+                );
+              },
+              child: Icon(Icons.add),
+            )
+          : null,
+>>>>>>> 0c8219e1ddce10ae49c5d55a9ced8b6ba125b75e
     );
   }
 }
