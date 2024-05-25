@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -33,7 +35,26 @@ class _StocksScreenState extends State<StocksScreen> {
     final productProvider = Provider.of<Products>(context, listen: false);
     final employeeProvider = Provider.of<EmployeeProvider>(context);
 
-    bool isEditor = employeeProvider.employee?.role == "Editor";
+    bool isUser = employeeProvider.employee?.role == "User";
+
+    Future<bool> checkUserRole() async {
+      User? currentUser = FirebaseAuth.instance.currentUser;
+
+      if (currentUser != null) {
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(currentUser.uid)
+            .get();
+
+        if (userDoc.exists) {
+          String role = userDoc['role'];
+          return role != "User" && role != "Inactive";
+        }
+      }
+      return false;
+    }
+
+    //final productProvider = Provider.of<Products>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -65,8 +86,8 @@ class _StocksScreenState extends State<StocksScreen> {
           Expanded(
             child:
                 ListView(scrollDirection: Axis.horizontal, children: <Widget>[
-              StreamBuilder<List<Product>>(
-                stream: productProvider.productsStream,
+              FutureBuilder<bool>(
+                future: checkUserRole(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(
@@ -75,30 +96,50 @@ class _StocksScreenState extends State<StocksScreen> {
                       ),
                     );
                   } else if (snapshot.hasError) {
-                    print(snapshot.error);
-                    return Center(child: Text('Error fetching products'));
-                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No products available'));
-                  } else {
-                    final products = snapshot.data!
-                        .where((product) => product.name
-                            .toLowerCase()
-                            .contains(_searchQuery.toLowerCase()))
-                        .toList();
-                    return ProductsDataTable(
-                      products: products,
-                      onProductSelected: (product, selected) {
-                        setState(() {
-                          if (selected) {
-                            _selectedProducts.add(product);
-                          } else {
-                            _selectedProducts.remove(product);
-                          }
-                        });
+                    return Center(child: Text('Error fetching user role'));
+                  } else if (snapshot.hasData) {
+                    bool allowSelection = snapshot.data!;
+                    return StreamBuilder<List<Product>>(
+                      stream: productProvider.productsStream,
+                      builder: (context, productSnapshot) {
+                        if (productSnapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: Lottie.asset(
+                              'assets/animations/loading.json',
+                            ),
+                          );
+                        } else if (productSnapshot.hasError) {
+                          return Center(child: Text('Error fetching products'));
+                        } else if (!productSnapshot.hasData ||
+                            productSnapshot.data!.isEmpty) {
+                          return Center(child: Text('No products available'));
+                        } else {
+                          final products = productSnapshot.data!
+                              .where((product) => product.name
+                                  .toLowerCase()
+                                  .contains(_searchQuery.toLowerCase()))
+                              .toList();
+                          return ProductsDataTable(
+                            products: products,
+                            allowSelection: allowSelection,
+                            onProductSelected: (product, selected) {
+                              setState(() {
+                                if (selected) {
+                                  _selectedProducts.add(product);
+                                } else {
+                                  _selectedProducts.remove(product);
+                                }
+                              });
+                            },
+                            isEditor: allowSelection,
+                            selectedProducts: _selectedProducts,
+                          );
+                        }
                       },
-                      isEditor: isEditor,
-                      selectedProducts: _selectedProducts,
                     );
+                  } else {
+                    return Center(child: Text('Failed to determine user role'));
                   }
                 },
               ),
@@ -106,19 +147,28 @@ class _StocksScreenState extends State<StocksScreen> {
           ),
         ],
       ),
-      floatingActionButton: isEditor
-          ? FloatingActionButton(
+      floatingActionButton: FutureBuilder<bool>(
+        future: checkUserRole(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return SizedBox.shrink();
+          } else if (snapshot.hasError) {
+            return SizedBox.shrink();
+          } else if (snapshot.hasData && snapshot.data == true) {
+            return FloatingActionButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => AddProductScreen(),
-                  ),
+                  MaterialPageRoute(builder: (context) => AddProductScreen()),
                 );
               },
               child: Icon(Icons.add),
-            )
-          : null,
+            );
+          } else {
+            return SizedBox.shrink();
+          }
+        },
+      ),
     );
   }
 }

@@ -46,10 +46,11 @@ class AuthProvider extends ChangeNotifier {
           email: email, password: password);
       _user = result.user;
       // Add user details to Firestore collection
-      await FirebaseFirestore.instance.collection('users').doc(_user!.uid).set({
-        'email': email,
-        'username': fullName,
-      });
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(_user!.uid)
+          .set({'email': email, 'username': fullName, 'uuid': _user!.uid});
+      await updateUserWithRole(_user!.uid, email, fullName);
       notifyListeners();
       return _user;
     } catch (error) {
@@ -74,6 +75,38 @@ class AuthProvider extends ChangeNotifier {
     } catch (error) {
       print(error.toString());
       return null;
+    }
+  }
+
+  Future<void> updateUserWithRole(
+      String userId, String email, String fullName) async {
+    try {
+      // Fetch the role from the employees collection where email matches
+      QuerySnapshot employeeSnapshot = await FirebaseFirestore.instance
+          .collection('employees')
+          .where('email', isEqualTo: email)
+          .get();
+
+      if (employeeSnapshot.docs.isNotEmpty) {
+        // Assume there's only one document that matches the email
+        DocumentSnapshot employeeDoc = employeeSnapshot.docs.first;
+
+        // Get the role field from the employee document
+        String role = employeeDoc['role'];
+
+        // Set the data in the users collection, including the role field
+        await FirebaseFirestore.instance.collection('users').doc(userId).set({
+          'email': email,
+          'username': fullName,
+          'role': role,
+        });
+
+        print('User updated with role successfully');
+      } else {
+        print('Employee document with the provided email does not exist');
+      }
+    } catch (e) {
+      print('Failed to update user with role: $e');
     }
   }
 }

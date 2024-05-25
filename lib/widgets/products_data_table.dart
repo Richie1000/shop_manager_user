@@ -4,30 +4,34 @@ import '../models/product.dart';
 import '../providers/products.dart';
 
 class ProductsDataTable extends StatefulWidget {
-  final List<Product> products; // The list of products to display
+  final List<Product> products;
+  final bool allowSelection;
 
-  const ProductsDataTable(
-      {required this.products,
-      required Null Function(dynamic product, dynamic selected)
-          onProductSelected,
-      required bool isEditor,
-      required List<Product> selectedProducts});
+  const ProductsDataTable({
+    required this.products,
+    required this.allowSelection,
+    required Null Function(dynamic product, dynamic selected) onProductSelected,
+    required bool isEditor,
+    required List<Product> selectedProducts,
+  });
 
   @override
   _ProductsDataTableState createState() => _ProductsDataTableState();
 }
 
 class _ProductsDataTableState extends State<ProductsDataTable> {
-  final Set<Product> selectedProducts = {}; // The set of selected products
+  final Set<Product> selectedProducts = {};
 
   void _onSelectedRow(bool selected, Product product) {
-    setState(() {
-      if (selected) {
-        selectedProducts.add(product);
-      } else {
-        selectedProducts.remove(product);
-      }
-    });
+    if (widget.allowSelection) {
+      setState(() {
+        if (selected) {
+          selectedProducts.add(product);
+        } else {
+          selectedProducts.remove(product);
+        }
+      });
+    }
   }
 
   void _editSelectedProduct(BuildContext context, Product product) {
@@ -76,30 +80,26 @@ class _ProductsDataTableState extends State<ProductsDataTable> {
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(context); // Close without saving
+                Navigator.pop(context);
               },
               child: Text("Cancel"),
             ),
             TextButton(
               onPressed: () {
-                // Create an updated product object with new values
                 final updatedProduct = Product(
                   name: nameController.text,
                   buyingPrice: double.parse(buyingPriceController.text),
                   sellingPrice: double.parse(sellingPriceController.text),
                   uom: uomController.text,
                   id: product.id,
-                  quantity: int.parse(
-                      quantityController.text), // Keep the original ID
+                  quantity: int.parse(quantityController.text),
                 );
-                print("product id : ${updatedProduct.id}");
-                // Update the product in the database
                 Provider.of<Products>(context, listen: false)
                     .updateProduct(product.id, updatedProduct);
 
                 selectedProducts.clear();
 
-                Navigator.pop(context); // Close after saving
+                Navigator.pop(context);
               },
               child: Text("Save"),
             ),
@@ -111,10 +111,8 @@ class _ProductsDataTableState extends State<ProductsDataTable> {
 
   void _deleteSelectedProduct() {
     if (selectedProducts.isNotEmpty) {
-      // Convert the Set to a List
       final List<Product> productsToDelete = selectedProducts.toList();
 
-      // Create the confirmation dialog
       showDialog(
         context: context,
         builder: (context) {
@@ -125,19 +123,18 @@ class _ProductsDataTableState extends State<ProductsDataTable> {
             actions: [
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Close without deleting
+                  Navigator.pop(context);
                 },
                 child: Text("Cancel"),
               ),
               TextButton(
                 onPressed: () {
-                  print(productsToDelete);
-                  Provider.of<Products>(context, listen: false).deleteProducts(
-                      productsToDelete); // Delete the products from the database
+                  Provider.of<Products>(context, listen: false)
+                      .deleteProducts(productsToDelete);
 
-                  selectedProducts.clear(); // Clear the selection
-                  setState(() {}); // Update the UI to reflect changes
-                  Navigator.pop(context); // Close the dialog
+                  selectedProducts.clear();
+                  setState(() {});
+                  Navigator.pop(context);
                 },
                 child: Text("Delete"),
               ),
@@ -153,7 +150,7 @@ class _ProductsDataTableState extends State<ProductsDataTable> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (selectedProducts.isNotEmpty) // Display edit and delete options
+        if (selectedProducts.isNotEmpty)
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
