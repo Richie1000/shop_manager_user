@@ -67,4 +67,26 @@ class Products with ChangeNotifier {
       }).toList();
     });
   }
+
+  void deleteProduct(String productId) {
+    _products.removeWhere((product) => product.id == productId);
+    notifyListeners();
+  }
+
+  // Method to delete multiple products
+  Future<void> deleteProducts(List<Product> products) async {
+    try {
+      int deleted = 0;
+      for (var product in products) {
+        print(product.id);
+        await _firestore.collection('products').doc(product.id).delete();
+        deleted++;
+        if (deleted == products.length) {
+          return;
+        }
+      }
+    } catch (e) {
+      throw e;
+    }
+  }
 }
