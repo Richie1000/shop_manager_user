@@ -39,20 +39,35 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future registerWithEmailAndPassword(
+  Future<User?> registerWithEmailAndPassword(
       String email, String password, String fullName) async {
     try {
+      // Check if the email exists in the "employees" collection
+      bool employeeExists = await checkEmployeeExists(email);
+      if (!employeeExists) {
+        Fluttertoast.showToast(
+          msg:
+              "Email not found in employees list. Contact Adminstrator to be able to register",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 1,
+          fontSize: 16.0,
+        );
+        return null;
+      }
+
+      // If email exists, proceed with registration
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
-      _user = result.user;
+      User? user = result.user;
+
       // Add user details to Firestore collection
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(_user!.uid)
-          .set({'email': email, 'username': fullName, 'uuid': _user!.uid});
-      await updateUserWithRole(_user!.uid, email, fullName);
+      await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
+        'email': email,
+        'username': fullName,
+      });
       notifyListeners();
-      return _user;
+      return user;
     } catch (error) {
       String modifiedErrorMessage =
           error.toString().replaceAll("firebase_auth", "");
@@ -65,6 +80,14 @@ class AuthProvider extends ChangeNotifier {
       );
       return null;
     }
+  }
+
+  Future<bool> checkEmployeeExists(String email) async {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('employees')
+        .where('email', isEqualTo: email)
+        .get();
+    return snapshot.docs.isNotEmpty;
   }
 
   Future signOut() async {

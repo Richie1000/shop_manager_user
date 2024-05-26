@@ -5,6 +5,7 @@ import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_manager_user/screens/add_product_screen.dart';
 import 'package:shop_manager_user/screens/loading_screen.dart';
+import 'package:shop_manager_user/widgets/custom_toast.dart';
 import '../models/product.dart';
 import '../providers/products.dart';
 import '../providers/employees.dart';
@@ -28,6 +29,34 @@ class _StocksScreenState extends State<StocksScreen> {
 
   void _deleteSelectedProducts() {
     // Implement your delete selected products logic here
+  }
+
+  String _selectedRole = "Viewer";
+  bool _isEditor = false;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkRole();
+  }
+
+  Future<void> _checkRole() async {
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection("employee")
+          .where("role", isEqualTo: "Editor")
+          .get();
+      setState(() {
+        _isEditor = querySnapshot.docs.isNotEmpty;
+        _isLoading = false;
+      });
+    } catch (e) {
+      CustomToast(message: e.toString());
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -79,9 +108,6 @@ class _StocksScreenState extends State<StocksScreen> {
       ),
       backgroundColor: Colors.white,
       body: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        verticalDirection: VerticalDirection.down,
         children: [
           Expanded(
             child:
