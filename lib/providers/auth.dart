@@ -59,12 +59,19 @@ Future<User?> registerWithEmailAndPassword(
     UserCredential result = await _auth.createUserWithEmailAndPassword(
         email: email, password: password);
     User? user = result.user;
-
+    final snapshot = await FirebaseFirestore.instance
+      .collection('employees')
+      .where('email', isEqualTo: email)
+      .get();
+      DocumentSnapshot employeeDoc = snapshot.docs.first;
+      String role = employeeDoc.get("role");
     // Add user details to Firestore collection
     await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
       'email': email,
       'username': fullName,
+      'role': role
     });
+    
     notifyListeners();
     return user;
   } catch (error) {

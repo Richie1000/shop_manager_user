@@ -33,7 +33,11 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'Arturo',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.deepPurple),
+          scaffoldBackgroundColor: Colors.white,
+          inputDecorationTheme: InputDecorationTheme(
+            filled: true,
+            fillColor: Colors.white, // Default background for TextFormField
+          ),
           useMaterial3: true,
         ),
         home: AuthWrapper(),

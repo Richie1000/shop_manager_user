@@ -49,6 +49,7 @@ String getReceiptNumber() {
   // Concatenate the month abbreviation with the formatted DateTime
   return '$month$formattedDateTime';
 }
+final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
 Future<Uint8List> generateAndSaveReceipt(
   List<CartItem> items,
@@ -58,7 +59,7 @@ Future<Uint8List> generateAndSaveReceipt(
 ) async {
   try {
     // Check product quantities before proceeding
-    await checkProductQuantities(items);
+    await checkProductQuantities(context,items);
 
     // Initialize PDF document
     final pdf = pw.Document();
@@ -219,7 +220,8 @@ Future<void> updateProductQuantities(List<CartItem> items) async {
   }
 }
 
-Future<void> checkProductQuantities(List<CartItem> items) async {
+
+Future<void> checkProductQuantities(BuildContext context, List<CartItem> items) async {
   final firestore = FirebaseFirestore.instance;
 
   for (var item in items) {
@@ -227,15 +229,22 @@ Future<void> checkProductQuantities(List<CartItem> items) async {
     final snapshot = await productRef.get();
 
     if (!snapshot.exists) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Product does not exist!"),
+        ),
+      );
       throw Exception("Product does not exist!");
     }
 
     final currentQuantity = snapshot['quantity'] as int;
 
     if (currentQuantity < item.quantity) {
-      CustomToast(
-          message: "Insufficient Stock for product: ${item.product.name}");
-      //Navigator.of(context).pop();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Insufficient Stock for product: ${item.product.name}"),
+        ),
+      );
       throw Exception("Insufficient stock for product: ${item.product.name}");
     }
   }

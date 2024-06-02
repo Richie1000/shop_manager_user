@@ -5,13 +5,16 @@ import '../providers/products.dart';
 
 class ProductsDataTable extends StatefulWidget {
   final List<Product> products; // The list of products to display
+  final Function(Product product, bool selected) onProductSelected;
+  final bool isEditor;
+  final List<Product> selectedProducts;
 
-  const ProductsDataTable(
-      {required this.products,
-      required Null Function(dynamic product, dynamic selected)
-          onProductSelected,
-      required bool isEditor,
-      required List<Product> selectedProducts});
+  const ProductsDataTable({
+    required this.products,
+    required this.onProductSelected,
+    required this.isEditor,
+    required this.selectedProducts,
+  });
 
   @override
   _ProductsDataTableState createState() => _ProductsDataTableState();
@@ -53,6 +56,7 @@ class _ProductsDataTableState extends State<ProductsDataTable> {
                 decoration: InputDecoration(labelText: "Name"),
               ),
               TextField(
+                readOnly: true,
                 controller: quantityController,
                 decoration: InputDecoration(labelText: "Quantity"),
                 keyboardType: TextInputType.number,
@@ -158,7 +162,7 @@ class _ProductsDataTableState extends State<ProductsDataTable> {
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
               Visibility(
-                visible: selectedProducts.length == 1,
+                visible: selectedProducts.length == 1 && widget.isEditor,
                 child: IconButton(
                   icon: Icon(Icons.edit),
                   onPressed: () {
@@ -170,7 +174,7 @@ class _ProductsDataTableState extends State<ProductsDataTable> {
                 ),
               ),
               Visibility(
-                visible: selectedProducts.length > 0,
+                visible: selectedProducts.length > 0 && widget.isEditor,
                 child: IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: _deleteSelectedProduct,
@@ -190,8 +194,9 @@ class _ProductsDataTableState extends State<ProductsDataTable> {
             rows: widget.products.map((product) {
               return DataRow(
                 selected: selectedProducts.contains(product),
-                onSelectChanged: (selected) =>
-                    _onSelectedRow(selected!, product),
+                onSelectChanged: widget.isEditor
+                    ? (selected) => _onSelectedRow(selected!, product)
+                    : null,
                 cells: [
                   DataCell(Text(product.name)),
                   DataCell(Text(product.quantity.toString())),

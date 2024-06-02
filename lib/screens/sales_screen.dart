@@ -150,7 +150,7 @@ class ProductSearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.search),
+      icon: Icon(Icons.arrow_back),
       onPressed: () {
         close(context, '');
       },

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -30,39 +31,67 @@ class _StocksScreenState extends State<StocksScreen> {
     // Implement your delete selected products logic here
   }
 
-String _selectedRole = "Viewer";
+  String _selectedRole = "Viewer";
   bool _isEditor = false;
   bool _isLoading = true;
-  
+  String role="";
+
   @override
   void initState() {
     super.initState();
     _checkRole();
+     print(role);
   }
 
-  Future<void> _checkRole() async {
-    try {
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection("employee")
-          .where("role", isEqualTo: "Editor")
+Future<void> _checkRole() async {
+  try {
+    // Get the currently logged-in user
+    User? user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      // Query the employees collection to get the document with the matching user ID
+      DocumentSnapshot employeeDoc = await FirebaseFirestore.instance
+          .collection("users")
+          .doc(user.uid)
           .get();
+
+      // Check if the document exists
+      if (employeeDoc.exists) {
+        // Get the role field from the document
+       role  = employeeDoc.get('role');
+
+        setState(() {
+         
+          _isEditor = role == 'Editor';
+          _isLoading = false;
+        });
+
+        
+      } else {
+        setState(() {
+          _isEditor = false;
+          _isLoading = false;
+        });
+      }
+    } else {
+      // Handle the case where there is no logged-in user
       setState(() {
-        _isEditor = querySnapshot.docs.isNotEmpty;
-        _isLoading = false;
-      });
-    } catch (e) {
-      CustomToast(message: e.toString());
-      setState(() {
+        _isEditor = false;
         _isLoading = false;
       });
     }
+  } catch (e) {
+    CustomToast(message: e.toString());
+    setState(() {
+      _isLoading = false;
+    });
   }
+}
+
+
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<Products>(context, listen: false);
-    final employeeProvider = Provider.of<EmployeeProvider>(context);
-
-    bool isEditor = employeeProvider.employee?.role == "Editor";
 
     return Scaffold(
       appBar: AppBar(
@@ -105,9 +134,12 @@ String _selectedRole = "Viewer";
                     );
                   } else if (snapshot.hasError) {
                     print(snapshot.error);
-                    return Center(child: Text('Error fetching products'));
+                    return const Center(child: Text('Error fetching products'));
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Center(child: Text('No products available'));
+                    return Align(
+                      alignment: Alignment.center,
+                      child: Text('No products available'),
+                    );
                   } else {
                     final products = snapshot.data!
                         .where((product) => product.name
@@ -125,9 +157,11 @@ String _selectedRole = "Viewer";
                           }
                         });
                       },
-                      isEditor: isEditor,
+                      
+                      isEditor: _isEditor, // Pass isEditor to ProductsDataTable
                       selectedProducts: _selectedProducts,
                     );
+                    
                   }
                 },
               ),
@@ -135,7 +169,7 @@ String _selectedRole = "Viewer";
           ),
         ],
       ),
-      floatingActionButton: isEditor
+      floatingActionButton: _isEditor
           ? FloatingActionButton(
               onPressed: () {
                 Navigator.push(
@@ -151,6 +185,7 @@ String _selectedRole = "Viewer";
     );
   }
 }
+
 
 class ProductSearchDelegate extends SearchDelegate<String> {
   final Products productProvider;
