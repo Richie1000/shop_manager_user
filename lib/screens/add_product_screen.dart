@@ -265,7 +265,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
                         borderRadius: BorderRadius.circular(10.0),
                       ),
                     ),
-                    child: Text(
+                    child: const Text(
                       'Add Product',
                       style: TextStyle(fontSize: 18.0, color: Colors.white),
                     ),

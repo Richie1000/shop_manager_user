@@ -8,7 +8,7 @@ import 'package:shop_manager_user/screens/loading_screen.dart';
 import 'package:shop_manager_user/widgets/custom_toast.dart';
 import '../models/product.dart';
 import '../providers/products.dart';
-import '../providers/employees.dart';
+
 import '../widgets/products_data_table.dart'; // Import EmployeeProvider
 
 class StocksScreen extends StatefulWidget {
@@ -19,9 +19,8 @@ class StocksScreen extends StatefulWidget {
 }
 
 class _StocksScreenState extends State<StocksScreen> {
-  TextEditingController _searchController = TextEditingController();
-  String _searchQuery = '';
-  List<Product> _selectedProducts = [];
+  final String _searchQuery = '';
+  final List<Product> _selectedProducts = [];
 
   void _editProduct(Product product) {
     // Implement your edit product logic here
@@ -34,60 +33,56 @@ class _StocksScreenState extends State<StocksScreen> {
   String _selectedRole = "Viewer";
   bool _isEditor = false;
   bool _isLoading = true;
-  String role="";
+  String role = "";
 
   @override
   void initState() {
     super.initState();
     _checkRole();
-     print(role);
+    print(role);
   }
 
-Future<void> _checkRole() async {
-  try {
-    // Get the currently logged-in user
-    User? user = FirebaseAuth.instance.currentUser;
+  Future<void> _checkRole() async {
+    try {
+      // Get the currently logged-in user
+      User? user = FirebaseAuth.instance.currentUser;
 
-    if (user != null) {
-      // Query the employees collection to get the document with the matching user ID
-      DocumentSnapshot employeeDoc = await FirebaseFirestore.instance
-          .collection("users")
-          .doc(user.uid)
-          .get();
+      if (user != null) {
+        // Query the employees collection to get the document with the matching user ID
+        DocumentSnapshot employeeDoc = await FirebaseFirestore.instance
+            .collection("users")
+            .doc(user.uid)
+            .get();
 
-      // Check if the document exists
-      if (employeeDoc.exists) {
-        // Get the role field from the document
-       role  = employeeDoc.get('role');
+        // Check if the document exists
+        if (employeeDoc.exists) {
+          // Get the role field from the document
+          role = employeeDoc.get('role');
 
-        setState(() {
-         
-          _isEditor = role == 'Editor';
-          _isLoading = false;
-        });
-
-        
+          setState(() {
+            _isEditor = role == 'Editor';
+            _isLoading = false;
+          });
+        } else {
+          setState(() {
+            _isEditor = false;
+            _isLoading = false;
+          });
+        }
       } else {
+        // Handle the case where there is no logged-in user
         setState(() {
           _isEditor = false;
           _isLoading = false;
         });
       }
-    } else {
-      // Handle the case where there is no logged-in user
+    } catch (e) {
+      CustomToast(message: e.toString());
       setState(() {
-        _isEditor = false;
         _isLoading = false;
       });
     }
-  } catch (e) {
-    CustomToast(message: e.toString());
-    setState(() {
-      _isLoading = false;
-    });
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -95,16 +90,16 @@ Future<void> _checkRole() async {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Stocks'),
+        title: const Text('Stocks'),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: const Icon(Icons.search),
             onPressed: () {
               showSearch(
                 context: context,
@@ -127,16 +122,14 @@ Future<void> _checkRole() async {
                 stream: productProvider.productsStream,
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: Lottie.asset(
-                        'assets/animations/loading.json',
-                      ),
-                    );
+                    return Center(child: LoadingScreen());
                   } else if (snapshot.hasError) {
-                    print(snapshot.error);
-                    return const Center(child: Text('Error fetching products'));
+                    return const Align(
+                      alignment: Alignment.center,
+                      child: Text('fetching Error!'),
+                    );
                   } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                    return Align(
+                    return const Align(
                       alignment: Alignment.center,
                       child: Text('No products available'),
                     );
@@ -157,11 +150,10 @@ Future<void> _checkRole() async {
                           }
                         });
                       },
-                      
+
                       isEditor: _isEditor, // Pass isEditor to ProductsDataTable
                       selectedProducts: _selectedProducts,
                     );
-                    
                   }
                 },
               ),
@@ -185,7 +177,6 @@ Future<void> _checkRole() async {
     );
   }
 }
-
 
 class ProductSearchDelegate extends SearchDelegate<String> {
   final Products productProvider;

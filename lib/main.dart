@@ -31,10 +31,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => EmployeeProvider()),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Arturo',
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
-          inputDecorationTheme: InputDecorationTheme(
+          inputDecorationTheme: const InputDecorationTheme(
             filled: true,
             fillColor: Colors.white, // Default background for TextFormField
           ),
@@ -70,7 +71,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
             return HomePage();
           }
         } else {
-          return Scaffold(
+          return const Scaffold(
             body: Center(
               child: CircularProgressIndicator(),
             ),

@@ -37,7 +37,10 @@ class HomePage extends StatelessWidget {
     }
 
     pushStatsScreen() {
-     Navigator.push(context, MaterialPageRoute(builder: (context)=> DetailStatsScreen()));
+         ScaffoldMessenger.of(context).showSnackBar(
+     const SnackBar(
+    content: Text("This Screen is not available yet!"),
+  ),);
     }
 
     pushStocksScreen() {
