@@ -87,74 +87,10 @@ String _selectedRole = "Viewer";
       ),
       backgroundColor: Colors.white,
       body: Column(
-
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        verticalDirection: VerticalDirection.down,
         children: [
-          if (_selectedRole == "Editor")
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  // Add delete functionality here
-                },
-                child: Text("Delete"),
-              ),
-            ),
-          Expanded(
-            child: StreamBuilder<List<Product>>(
-              stream: productProvider.productsStream,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return LoadingScreen();
-                } else if (snapshot.hasError) {
-                  print(snapshot.error);
-                  return Center(child: Text('Error fetching products'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No products available'));
-                } else {
-                  final products = snapshot.data!
-                      .where((product) => product.name
-                          .toLowerCase()
-                          .contains(_searchQuery.toLowerCase()))
-                      .toList();
-                  return SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: DataTable(
-                      columns: [
-                        DataColumn(label: Text('Name')),
-                        DataColumn(label: Text('Quantity')),
-                        DataColumn(label: Text('Selling Price')),
-                        DataColumn(label: Text('Buying Price')),
-                        DataColumn(label: Text('UOM')),
-                      ],
-                      rows: products.map((product) {
-                        return DataRow(cells: [
-                          DataCell(Text(product.name)),
-                          DataCell(Text(product.quantity.toString())),
-                          DataCell(Text('\$${product.sellingPrice.toStringAsFixed(2)}')),
-                          DataCell(Text('\$${product.buyingPrice.toStringAsFixed(2)}')),
-                          DataCell(Text(product.uom)),
-                        ]);
-                      }).toList(),
-                    ),
-                  );
-                }
-              },
-            ),
-          ),
-        ],
-      ),
-      floatingActionButton: _isLoading
-          ? null
-          : _isEditor
-              ? FloatingActionButton.extended(
-                  onPressed: () {
-                    // Add functionality here
-                  },
-                  icon: Icon(Icons.add),
-                  label: Text("Add"),
-                )
-              : null,
-
-        
           Expanded(
             child:
                 ListView(scrollDirection: Axis.horizontal, children: <Widget>[
@@ -212,7 +148,6 @@ String _selectedRole = "Viewer";
               child: Icon(Icons.add),
             )
           : null,
->>>>>>> 0c8219e1ddce10ae49c5d55a9ced8b6ba125b75e
     );
   }
 }

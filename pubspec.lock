@@ -25,6 +25,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.11.0"
+  bar_chart:
+    dependency: "direct main"
+    description:
+      name: bar_chart
+      sha256: "5e29ed748e15762c08e65c878f8d35defb8e887fcc4f41705a6b3192a8a6927a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0+1"
   barcode:
     dependency: transitive
     description:
