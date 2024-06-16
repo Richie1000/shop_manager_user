@@ -38,7 +38,7 @@ class AuthScreen extends StatelessWidget {
                 children: <Widget>[
                   Flexible(
                     child: Container(
-                      margin: const EdgeInsets.only(bottom: 10.0),
+                      margin: const EdgeInsets.only(bottom: 8.0),
                       padding:
                           const EdgeInsets.symmetric(vertical: 8.0, horizontal: 50.0),
                       // transform: Matrix4.rotationZ(-8 * pi / 180)
@@ -54,13 +54,15 @@ class AuthScreen extends StatelessWidget {
                           )
                         ],
                       ),
-                      child: const Text(
-                        'AEL-MAL ELECTRICAL HUB',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 28,
-                          fontFamily: 'Anton',
-                          fontWeight: FontWeight.normal,
+                      child: Container(
+                        child: const Text(
+                          'AEL-MAL ELECTRICALS',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontFamily: 'Anton',
+                            fontWeight: FontWeight.normal,
+                          ),
                         ),
                       ),
                     ),
