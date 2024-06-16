@@ -22,7 +22,7 @@ class _AuthCardState extends State<AuthCard>
     with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey();
   AuthMode _authMode = AuthMode.Login;
-  Map<String, String> _authData = {
+  final Map<String, String> _authData = {
     'email': '',
     'password': '',
     'confirmPassword': '',
@@ -220,7 +220,7 @@ class _AuthCardState extends State<AuthCard>
                                 ),
                                 TextFormField(
                                   decoration:
-                                      InputDecoration(labelText: 'Name'),
+                                      const InputDecoration(labelText: 'Name'),
                                   controller: _nameController,
                                   validator: (value) {
                                     if (value!.isEmpty) {
@@ -233,9 +233,9 @@ class _AuthCardState extends State<AuthCard>
                                 ),
                               ],
                             )
-                          : SizedBox.shrink(),
+                          : const SizedBox.shrink(),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20,
                     ),
                     TextButton(
@@ -243,13 +243,9 @@ class _AuthCardState extends State<AuthCard>
                       child: Text("Forgot Password"),
                     ),
                     if (_isLoading)
-                      CircularProgressIndicator()
+                      const CircularProgressIndicator()
                     else if (!forgotPassword)
                       ElevatedButton(
-                        child: Text(
-                          _authMode == AuthMode.Login ? "Login" : "Sign Up",
-                          style: TextStyle(color: Colors.white),
-                        ),
                         onPressed: () {
                           //print("here");
                           _submit(context);
@@ -259,7 +255,7 @@ class _AuthCardState extends State<AuthCard>
                             borderRadius: BorderRadius.circular(30),
                           ),
                           backgroundColor: Theme.of(context).primaryColor,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 30.0, vertical: 8.0),
                           textStyle: TextStyle(
                             color: Theme.of(context)
@@ -267,6 +263,10 @@ class _AuthCardState extends State<AuthCard>
                                 .labelLarge!
                                 .color,
                           ),
+                        ),
+                        child: Text(
+                          _authMode == AuthMode.Login ? "Login" : "Sign Up",
+                          style: const TextStyle(color: Colors.white),
                         ),
                       ),
                     if (forgotPassword)
@@ -278,9 +278,9 @@ class _AuthCardState extends State<AuthCard>
                             borderRadius: BorderRadius.circular(30),
                           ),
                           backgroundColor: Theme.of(context).primaryColor,
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 30.0, vertical: 8.0),
-                          textStyle: TextStyle(
+                          textStyle: const TextStyle(
                               //color: Theme.of(context).primaryTextTheme.button.color,
                               ),
                         ),

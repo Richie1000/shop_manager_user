@@ -1,7 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_manager_user/screens/add_product_screen.dart';
 import 'package:shop_manager_user/screens/loading_screen.dart';
@@ -22,24 +21,16 @@ class _StocksScreenState extends State<StocksScreen> {
   final String _searchQuery = '';
   final List<Product> _selectedProducts = [];
 
-  void _editProduct(Product product) {
-    // Implement your edit product logic here
-  }
 
-  void _deleteSelectedProducts() {
-    // Implement your delete selected products logic here
-  }
 
-  String _selectedRole = "Viewer";
   bool _isEditor = false;
-  bool _isLoading = true;
   String role = "";
 
   @override
   void initState() {
     super.initState();
     _checkRole();
-    print(role);
+
   }
 
   Future<void> _checkRole() async {
@@ -61,25 +52,21 @@ class _StocksScreenState extends State<StocksScreen> {
 
           setState(() {
             _isEditor = role == 'Editor';
-            _isLoading = false;
           });
         } else {
           setState(() {
             _isEditor = false;
-            _isLoading = false;
           });
         }
       } else {
         // Handle the case where there is no logged-in user
         setState(() {
           _isEditor = false;
-          _isLoading = false;
         });
       }
     } catch (e) {
       CustomToast(message: e.toString());
       setState(() {
-        _isLoading = false;
       });
     }
   }
@@ -171,7 +158,7 @@ class _StocksScreenState extends State<StocksScreen> {
                   ),
                 );
               },
-              child: Icon(Icons.add),
+              child: const Icon(Icons.add),
             )
           : null,
     );
@@ -187,7 +174,7 @@ class ProductSearchDelegate extends SearchDelegate<String> {
   List<Widget> buildActions(BuildContext context) {
     return [
       IconButton(
-        icon: Icon(Icons.clear),
+        icon: const Icon(Icons.clear),
         onPressed: () {
           query = '';
         },
@@ -198,7 +185,7 @@ class ProductSearchDelegate extends SearchDelegate<String> {
   @override
   Widget buildLeading(BuildContext context) {
     return IconButton(
-      icon: Icon(Icons.arrow_back),
+      icon: const Icon(Icons.arrow_back),
       onPressed: () {
         close(context, '');
       },
@@ -216,7 +203,7 @@ class ProductSearchDelegate extends SearchDelegate<String> {
       stream: productProvider.productsStream,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator());
         }
 
         final products = snapshot.data!
@@ -249,7 +236,7 @@ class ProductSearchDelegate extends SearchDelegate<String> {
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context),
-                        child: Text('Close'),
+                        child: const Text('Close'),
                       ),
                     ],
                   ),

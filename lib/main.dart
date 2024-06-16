@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:shop_manager_user/models/employee.dart';
 import 'package:shop_manager_user/providers/auth.dart' as au;
+import 'package:shop_manager_user/providers/userstate.dart';
 import 'package:shop_manager_user/screens/auth_screen.dart';
 import 'package:shop_manager_user/screens/stocks_screen.dart';
 import './screens/home.dart';
@@ -29,10 +30,11 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => Products()),
         ChangeNotifierProvider(create: (context) => Cart()),
         ChangeNotifierProvider(create: (context) => EmployeeProvider()),
+        ChangeNotifierProvider(create: (context) => UserState()),
       ],
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        title: 'Arturo',
+        title: 'AEL-MAL ELECTRICAL HUB',
         theme: ThemeData(
           scaffoldBackgroundColor: Colors.white,
           inputDecorationTheme: const InputDecorationTheme(
@@ -64,9 +66,14 @@ class _AuthWrapperState extends State<AuthWrapper> {
             return AuthScreen();
           } else {
             // Schedule fetchEmployee after the build is complete
-            SchedulerBinding.instance.addPostFrameCallback((_) {
+            SchedulerBinding.instance.addPostFrameCallback((_) async {
               Provider.of<EmployeeProvider>(context, listen: false)
                   .fetchEmployee();
+              await Provider.of<UserState>(context, listen: false)
+                  .checkActiveStatus(user.email!);
+              if (!Provider.of<UserState>(context, listen: false).isActive) {
+                FirebaseAuth.instance.signOut();
+              }
             });
             return HomePage();
           }

@@ -19,17 +19,17 @@ class AuthScreen extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color.fromRGBO(221, 214, 243, 1).withOpacity(0.5),
-                  Color.fromRGBO(250, 172, 168, 1).withOpacity(0.7),
+                  const Color.fromRGBO(221, 214, 243, 1).withOpacity(0.5),
+                  const Color.fromRGBO(250, 172, 168, 1).withOpacity(0.7),
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                stops: [0, 1],
+                stops: const [0, 1],
               ),
             ),
           ),
           SingleChildScrollView(
-            child: Container(
+            child: SizedBox(
               height: deviceSize.height,
               width: deviceSize.width,
               child: Column(
@@ -38,15 +38,15 @@ class AuthScreen extends StatelessWidget {
                 children: <Widget>[
                   Flexible(
                     child: Container(
-                      margin: EdgeInsets.only(bottom: 10.0),
+                      margin: const EdgeInsets.only(bottom: 10.0),
                       padding:
-                          EdgeInsets.symmetric(vertical: 8.0, horizontal: 50.0),
+                          const EdgeInsets.symmetric(vertical: 8.0, horizontal: 50.0),
                       // transform: Matrix4.rotationZ(-8 * pi / 180)
                       //   ..translate(-10.0),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(20),
                         color: Colors.deepOrange.shade700,
-                        boxShadow: [
+                        boxShadow: const [
                           BoxShadow(
                             blurRadius: 8,
                             color: Colors.black26,
@@ -54,11 +54,11 @@ class AuthScreen extends StatelessWidget {
                           )
                         ],
                       ),
-                      child: Text(
-                        'ARTURO\'S',
+                      child: const Text(
+                        'AEL-MAL ELECTRICAL HUB',
                         style: TextStyle(
                           color: Colors.white,
-                          fontSize: 35,
+                          fontSize: 28,
                           fontFamily: 'Anton',
                           fontWeight: FontWeight.normal,
                         ),

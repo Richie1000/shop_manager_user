@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:shop_manager_user/widgets/custom_toast.dart';
 
 class AuthProvider extends ChangeNotifier {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -46,7 +45,7 @@ Future<User?> registerWithEmailAndPassword(
     bool employeeExists = await checkEmployeeExists(email);
     if (!employeeExists) {
       Fluttertoast.showToast(
-        msg: "Email not found in employees list. Contact Adminstrator to be able to register",
+        msg: "Email not found in employees list. Contact Administrator to be able to register",
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 1,
@@ -63,15 +62,19 @@ Future<User?> registerWithEmailAndPassword(
       .collection('employees')
       .where('email', isEqualTo: email)
       .get();
-      DocumentSnapshot employeeDoc = snapshot.docs.first;
-      String role = employeeDoc.get("role");
+
+    DocumentSnapshot employeeDoc = snapshot.docs.first;
+    String role = employeeDoc.get("role");
+    bool active = employeeDoc.get("active"); // Ensure the 'active' field is retrieved as a boolean
+
     // Add user details to Firestore collection
     await FirebaseFirestore.instance.collection('users').doc(user!.uid).set({
       'email': email,
       'username': fullName,
-      'role': role
+      'role': role,
+      'active': active
     });
-    
+
     notifyListeners();
     return user;
   } catch (error) {

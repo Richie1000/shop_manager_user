@@ -39,16 +39,16 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   return ListTile(
                     title: Text(item.product.name),
                     subtitle: Text(
-                        '${item.quantity} x \$${item.product.sellingPrice.toStringAsFixed(2)}'),
+                        '${item.quantity} x ₵${item.product.sellingPrice.toStringAsFixed(2)}'),
                     trailing: Text(
-                        '\$${(item.quantity * item.product.sellingPrice).toStringAsFixed(2)}'),
+                        '₵${(item.quantity * item.product.sellingPrice).toStringAsFixed(2)}'),
                   );
                 },
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: Text('Total: \$${cart.totalAmount.toStringAsFixed(2)}'),
+              child: Text('Total: ₵${cart.totalAmount.toStringAsFixed(2)}'),
             ),
             ElevatedButton(
               onPressed: () async {
