@@ -33,41 +33,37 @@ class _AddProductScreenState extends State<AddProductScreen> {
         _isLoading = true;
       });
       try {
-        QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-            .collection('products')
-            .where('name', isEqualTo: _nameController.text)
-            .get();
-        if (querySnapshot.docs.isEmpty) {
-          final docRef =
-              await FirebaseFirestore.instance.collection('products').add({
-            'name': _nameController.text,
-            'sellingPrice': double.parse(_priceController.text),
-            'buyingPrice': double.parse(_buyingPriceController.text),
-            'quantity': int.parse(_quantityController.text),
-            'uom': _selectedUom,
-          });
+           QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection('products')
+          .where('name', isEqualTo: _nameController.text)
+          .get();
+        if(querySnapshot.docs.isEmpty){
+        final docRef =
+            await FirebaseFirestore.instance.collection('products').add({
+          'name': _nameController.text,
+          'sellingPrice': double.parse(_priceController.text),
+          'buyingPrice': double.parse(_buyingPriceController.text),
+          'quantity': int.parse(_quantityController.text),
+          'uom': _selectedUom,
+        });
 
-          final newProduct = Product(
-            id: docRef.id,
-            name: _nameController.text,
-            sellingPrice: double.parse(_priceController.text),
-            buyingPrice: double.parse(_buyingPriceController.text),
-            quantity: int.parse(_quantityController.text),
-            uom: _selectedUom,
-          );
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Product ${_nameController.text} added!')),
-          );
-          // Update the document with the correct ID
-          await FirebaseFirestore.instance
-              .collection('products')
-              .doc(docRef.id)
-              .set(newProduct.toFirestore());
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-              content:
-                  Text('Already existing product, update product instead')));
-        }
+        final newProduct = Product(
+          id: docRef.id,
+          name: _nameController.text,
+          sellingPrice: double.parse(_priceController.text),
+          buyingPrice: double.parse(_buyingPriceController.text),
+          quantity: int.parse(_quantityController.text),
+          uom: _selectedUom,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Product ${_nameController.text} added!')),
+        );
+        // Update the document with the correct ID
+       
+            } else{
+                ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Already existing product, update product instead')));
+            }
       } catch (e) {
         CustomToast(message: e.toString());
       } finally {
@@ -79,6 +75,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
         setState(() {
           _isLoading = false;
         });
+        
       }
     }
   }

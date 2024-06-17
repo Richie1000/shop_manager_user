@@ -56,7 +56,6 @@ class _ProductsDataTableState extends State<ProductsDataTable> {
                 decoration: InputDecoration(labelText: "Name"),
               ),
               TextField(
-                readOnly: true,
                 controller: quantityController,
                 decoration: InputDecoration(labelText: "Quantity"),
                 keyboardType: TextInputType.number,

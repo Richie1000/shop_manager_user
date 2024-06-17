@@ -32,6 +32,7 @@ class _SalesScreenState extends State<SalesScreen> {
     cart.decrementItem(product);
   }
 
+
   @override
   Widget build(BuildContext context) {
     final productProvider = Provider.of<Products>(context, listen: false);
