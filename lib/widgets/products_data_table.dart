@@ -53,26 +53,26 @@ class _ProductsDataTableState extends State<ProductsDataTable> {
             children: [
               TextField(
                 controller: nameController,
-                decoration: InputDecoration(labelText: "Name"),
+                decoration: const InputDecoration(labelText: "Name"),
               ),
               TextField(
                 controller: quantityController,
-                decoration: InputDecoration(labelText: "Quantity"),
+                decoration: const InputDecoration(labelText: "Quantity"),
                 keyboardType: TextInputType.number,
               ),
               TextField(
                 controller: buyingPriceController,
-                decoration: InputDecoration(labelText: "Buying Price"),
+                decoration: const InputDecoration(labelText: "Buying Price"),
                 keyboardType: TextInputType.number,
               ),
               TextField(
                 controller: sellingPriceController,
-                decoration: InputDecoration(labelText: "Selling Price"),
+                decoration: const InputDecoration(labelText: "Selling Price"),
                 keyboardType: TextInputType.number,
               ),
               TextField(
                 controller: uomController,
-                decoration: InputDecoration(labelText: "Unit of Measure"),
+                decoration: const InputDecoration(labelText: "Unit of Measure"),
               ),
             ],
           ),

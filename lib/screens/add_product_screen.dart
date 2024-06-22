@@ -5,7 +5,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/product.dart';
 
 class AddProductScreen extends StatefulWidget {
+  const AddProductScreen({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _AddProductScreenState createState() => _AddProductScreenState();
 }
 
@@ -47,7 +50,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
           'uom': _selectedUom,
         });
 
-        final newProduct = Product(
+        Product(
           id: docRef.id,
           name: _nameController.text,
           sellingPrice: double.parse(_priceController.text),
@@ -55,14 +58,16 @@ class _AddProductScreenState extends State<AddProductScreen> {
           quantity: int.parse(_quantityController.text),
           uom: _selectedUom,
         );
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Product ${_nameController.text} added!')),
         );
         // Update the document with the correct ID
        
             } else{
+                // ignore: use_build_context_synchronously
                 ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Already existing product, update product instead')));
+          const SnackBar(content: Text('Already existing product, update product instead')));
             }
       } catch (e) {
         CustomToast(message: e.toString());
@@ -84,7 +89,7 @@ class _AddProductScreenState extends State<AddProductScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Product'),
+        title: const Text('Add Product'),
         backgroundColor: Colors.teal,
       ),
       backgroundColor: Colors.white,

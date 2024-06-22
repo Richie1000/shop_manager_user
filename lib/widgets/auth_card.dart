@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shop_manager_user/screens/loading_screen.dart';
-import 'custom_toast.dart';
 // import '../functions/login.dart';
 import '../providers/auth.dart';
 
@@ -11,8 +10,8 @@ bool forgotPassword = false;
 
 class AuthCard extends StatefulWidget {
   const AuthCard({
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   _AuthCardState createState() => _AuthCardState();
@@ -43,8 +42,8 @@ class _AuthCardState extends State<AuthCard>
   void initState() {
     super.initState();
     _controller =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 300));
-    _slideAnimation = Tween<Offset>(begin: Offset(0, -1.5), end: Offset(0, 0))
+        AnimationController(vsync: this, duration: const Duration(milliseconds: 300));
+    _slideAnimation = Tween<Offset>(begin: const Offset(0, -1.5), end: const Offset(0, 0))
         .animate(
             CurvedAnimation(parent: _controller, curve: Curves.fastOutSlowIn));
     _opacityAnimation = Tween(begin: 0.0, end: 1.0)
@@ -138,14 +137,14 @@ class _AuthCardState extends State<AuthCard>
           ),
           elevation: 8.0,
           child: AnimatedContainer(
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.easeIn,
             height: _authMode == AuthMode.Signup ? 400 : 300,
             constraints: BoxConstraints(
               minHeight: _authMode == AuthMode.Signup ? 400 : 300,
             ),
             width: deviceSize.width * 0.75,
-            padding: EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(16.0),
             child: Form(
               key: _formKey,
               child: SingleChildScrollView(
@@ -153,12 +152,13 @@ class _AuthCardState extends State<AuthCard>
                   children: <Widget>[
                     TextFormField(
                       controller: _emailController,
-                      decoration: InputDecoration(labelText: 'E-Mail'),
+                      decoration: const InputDecoration(labelText: 'E-Mail'),
                       keyboardType: TextInputType.emailAddress,
                       validator: (value) {
                         if (value!.isEmpty || !value.contains('@')) {
                           return 'Invalid email!';
                         }
+                        return null;
                       },
                       onSaved: (value) {
                         _authData['email'] = value!;
@@ -182,13 +182,14 @@ class _AuthCardState extends State<AuthCard>
                         if (value!.isEmpty || value.length < 5) {
                           return 'Password is too short!';
                         }
+                        return null;
                       },
                       onSaved: (value) {
                         _authData['password'] = value!;
                       },
                     ),
                     AnimatedSize(
-                      duration: Duration(milliseconds: 300),
+                      duration: const Duration(milliseconds: 300),
                       curve: Curves.easeIn,
                       child: _authMode == AuthMode.Signup
                           ? Column(
@@ -212,6 +213,7 @@ class _AuthCardState extends State<AuthCard>
                                               _passwordController.text) {
                                             return 'Passwords do not match!';
                                           }
+                                          return null;
                                         }
                                       : null,
                                   onSaved: (value) {
@@ -226,6 +228,7 @@ class _AuthCardState extends State<AuthCard>
                                     if (value!.isEmpty) {
                                       return 'Please enter your name!';
                                     }
+                                    return null;
                                   },
                                   onSaved: (value) {
                                     _authData['name'] = value!;
@@ -240,7 +243,7 @@ class _AuthCardState extends State<AuthCard>
                     ),
                     TextButton(
                       onPressed: () {},
-                      child: Text("Forgot Password"),
+                      child: const Text("Forgot Password"),
                     ),
                     if (_isLoading)
                       const CircularProgressIndicator()
@@ -271,7 +274,6 @@ class _AuthCardState extends State<AuthCard>
                       ),
                     if (forgotPassword)
                       ElevatedButton(
-                        child: Text("Reset Password"),
                         onPressed: () {},
                         style: ElevatedButton.styleFrom(
                           shape: RoundedRectangleBorder(
@@ -284,6 +286,7 @@ class _AuthCardState extends State<AuthCard>
                               //color: Theme.of(context).primaryTextTheme.button.color,
                               ),
                         ),
+                        child: const Text("Reset Password"),
                       ),
                     TextButton(
                       onPressed: _switchAuthMode,
